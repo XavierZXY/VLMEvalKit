@@ -45,7 +45,9 @@ class Qwen2VLPromptMixin:
             return True
         return False
 
-    def build_prompt(self, line, dataset: str) -> list[dict[str, str]]:
+    def build_prompt(
+        self, line, few_shot_examples, dataset: str
+    ) -> list[dict[str, str]]:
         from vlmeval.dataset import DATASET_TYPE
 
         if dataset in {"MMMU_DEV_VAL", "MMMU_TEST"}:
@@ -54,7 +56,7 @@ class Qwen2VLPromptMixin:
         if dataset_type == "MCQ":
             return self._build_mcq_prompt(line, dataset)
         if dataset_type == "Y/N":
-            return self._build_yorn_prompt(line, dataset)
+            return self._build_yorn_shots_prompt(line, few_shot_examples, dataset)
         if dataset_type == "VQA":
             return self._build_vqa_prompt(line, dataset)
         raise ValueError(f"Unsupported dataset: {dataset}")
@@ -138,11 +140,57 @@ class Qwen2VLPromptMixin:
 
     def _build_yorn_prompt(self, line, dataset: str) -> list[dict[str, str]]:
         """change the prompt for YORN dataset:"""
-        YORN_PROMPT = " Please answer yes or no."
+        YORN_PROMPT = " Please answer yes or nooooooooooooo."
 
         tgt_path = self.dump_image(line, dataset)
         question = line["question"]
         msgs = []
+        if isinstance(tgt_path, list):
+            msgs.extend([dict(type="image", value=p) for p in tgt_path])
+        else:
+            msgs = [dict(type="image", value=tgt_path)]
+        msgs.append(dict(type="text", value=question))
+        assert msgs[-1]["type"] == "text"
+        msgs[-1]["value"] += YORN_PROMPT
+        return msgs
+
+    def _build_yorn_shots_prompt(
+        self, line, few_shot_examples, dataset: str
+    ) -> list[dict[str, str]]:
+        """change the prompt for YORN dataset:"""
+        YORN_PROMPT = "Now, according the above exapmles. Please answer yes or no."
+
+        tgt_path = self.dump_image(line, dataset)
+        question = line["question"]
+        msgs = []
+
+        # shots
+        if few_shot_examples:
+            msgs.append(
+                dict(
+                    type="text",
+                    value="I will give you some examples\n",
+                )
+            )
+            for example in few_shot_examples:
+                if isinstance(example, int):
+                    example = self.data.iloc[example]
+                example_tgt_path = self.dump_image(example, dataset)
+                example_question = example["question"]
+                example_answer = example["answer"]
+
+                if isinstance(example_tgt_path, list):
+                    msgs.extend([dict(type="image", value=p) for p in example_tgt_path])
+                else:
+                    msgs.append(dict(type="image", value=example_tgt_path))
+
+                msgs.append(
+                    dict(
+                        type="text",
+                        value=f"Question: {example_question}\nAnswer: {example_answer}\n",
+                    )
+                )
+
         if isinstance(tgt_path, list):
             msgs.extend([dict(type="image", value=p) for p in tgt_path])
         else:

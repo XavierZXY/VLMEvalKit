@@ -1,5 +1,7 @@
+import debugpy
 import torch
 import torch.distributed as dist
+
 from vlmeval.config import supported_VLM
 from vlmeval.dataset import build_dataset
 from vlmeval.inference import infer_data_job
@@ -7,6 +9,14 @@ from vlmeval.inference_mt import infer_data_job_mt
 from vlmeval.inference_video import infer_data_job_video
 from vlmeval.smp import *
 from vlmeval.utils.result_transfer import MMMU_result_transfer, MMTBench_result_transfer
+
+try:
+    # 5678 is the default attach port in the VS Code debug configurations. Unless a host and port are specified, host defaults to 127.0.0.1
+    debugpy.listen(("localhost", 9501))
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
+except Exception as e:
+    pass
 
 
 def parse_args():
