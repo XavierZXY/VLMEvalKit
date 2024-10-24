@@ -1,5 +1,6 @@
 import torch
 import torch.distributed as dist
+import tqdm
 
 from vlmeval.config import supported_VLM
 from vlmeval.smp import *
@@ -129,17 +130,21 @@ def infer_data(model_name, work_dir, dataset, out_file, verbose=False, api_nproc
     else:
         model.set_dump_image(dataset.dump_image)
 
-    shots = 2
+    shots = 0
     for i in tqdm(range(lt)):
         idx = data.iloc[i]["index"]
         if idx in res:
             continue
 
-        # 构建 few-shot 示例
-        few_shot_examples = []
-        for j in range(shots):
-            example_idx = (i + j) % len(data)  # 选择示例的索引
-            few_shot_examples.append(data.iloc[example_idx])
+        if shots:
+            # 构建 few-shot 示例
+            few_shot_examples = []
+            # 获取当前行的 shots 列内容并解析为索引列表
+            shots_indices = data.iloc[i]["shots"].split(",")
+            for j in range(shots):
+                # choose shots
+                example_idx = int(shots_indices[j]) % len(data)
+                few_shot_examples.append(data.iloc[example_idx])
 
         if hasattr(model, "use_custom_prompt") and model.use_custom_prompt(
             dataset_name
@@ -148,7 +153,7 @@ def infer_data(model_name, work_dir, dataset, out_file, verbose=False, api_nproc
                 data.iloc[i], few_shot_examples, dataset=dataset_name
             )
         else:
-            struct = dataset.build_prompt(data.iloc[i])
+            struct = dataset.build_prompt(data.iloc[i], few_shot_examples)
 
         response = model.generate(message=struct, dataset=dataset_name)
         torch.cuda.empty_cache()
