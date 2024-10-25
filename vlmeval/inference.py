@@ -136,9 +136,9 @@ def infer_data(model_name, work_dir, dataset, out_file, verbose=False, api_nproc
         if idx in res:
             continue
 
+        few_shot_examples = []
         if shots:
             # 构建 few-shot 示例
-            few_shot_examples = []
             # 获取当前行的 shots 列内容并解析为索引列表
             shots_indices = data.iloc[i]["shots"].split(",")
             for j in range(shots):
