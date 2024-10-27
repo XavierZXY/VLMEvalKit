@@ -81,7 +81,9 @@ def infer_data_api(
     return res
 
 
-def infer_data(model_name, work_dir, dataset, out_file, verbose=False, api_nproc=4):
+def infer_data(
+    model_name, work_dir, dataset, out_file, verbose=False, api_nproc=4, shots=0
+):
     dataset_name = dataset.dataset_name
     prev_file = f"{work_dir}/{model_name}_{dataset_name}_PREV.pkl"
     res = load(prev_file) if osp.exists(prev_file) else {}
@@ -130,30 +132,17 @@ def infer_data(model_name, work_dir, dataset, out_file, verbose=False, api_nproc
     else:
         model.set_dump_image(dataset.dump_image)
 
-    shots = 0
     for i in tqdm(range(lt)):
         idx = data.iloc[i]["index"]
         if idx in res:
             continue
 
-        few_shot_examples = []
-        if shots:
-            # 构建 few-shot 示例
-            # 获取当前行的 shots 列内容并解析为索引列表
-            shots_indices = data.iloc[i]["shots"].split(",")
-            for j in range(shots):
-                # choose shots
-                example_idx = int(shots_indices[j]) % len(data)
-                few_shot_examples.append(data.iloc[example_idx])
-
         if hasattr(model, "use_custom_prompt") and model.use_custom_prompt(
             dataset_name
         ):
-            struct = model.build_prompt(
-                data.iloc[i], few_shot_examples, dataset=dataset_name
-            )
+            struct = model.build_prompt(data.iloc[i], shots, dataset=dataset_name)
         else:
-            struct = dataset.build_prompt(data.iloc[i], few_shot_examples)
+            struct = dataset.build_prompt(data.iloc[i], shots)
 
         response = model.generate(message=struct, dataset=dataset_name)
         torch.cuda.empty_cache()
@@ -179,6 +168,7 @@ def infer_data_job(
     verbose=False,
     api_nproc=4,
     ignore_failed=False,
+    shots=0,
 ):
     rank, world_size = get_rank_and_world_size()
     dataset_name = dataset.dataset_name
@@ -205,6 +195,7 @@ def infer_data_job(
         out_file=out_file,
         verbose=verbose,
         api_nproc=api_nproc,
+        shots=shots,
     )
     if world_size > 1:
         dist.barrier()

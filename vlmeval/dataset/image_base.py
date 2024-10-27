@@ -154,7 +154,7 @@ class ImageBaseDataset:
         pass
 
     # Given one data record, return the built prompt (a multi-modal message), can override
-    def build_prompt(self, line, few_shots):
+    def build_prompt(self, line, few_shots=0):
         if isinstance(line, int):
             line = self.data.iloc[line]
 
@@ -193,6 +193,7 @@ class ImageBaseDataset:
                         value=f"Question: {example_question}\nAnswer: {example_answer}\n",
                     )
                 )
+
         if isinstance(tgt_path, list):
             msgs.extend([dict(type="image", value=p) for p in tgt_path])
         else:

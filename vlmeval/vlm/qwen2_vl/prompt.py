@@ -40,14 +40,13 @@ class Qwen2VLPromptMixin:
         }:  # MME has it's own prompt
             return True
         if dataset_type == "VQA" and dataset not in {
-            "MMVet"
+            "MMVet",
+            "Open_MI",
         }:  # MMVet VQA has it's own prompt
             return True
         return False
 
-    def build_prompt(
-        self, line, few_shot_examples, dataset: str
-    ) -> list[dict[str, str]]:
+    def build_prompt(self, line, shots, dataset: str) -> list[dict[str, str]]:
         from vlmeval.dataset import DATASET_TYPE
 
         if dataset in {"MMMU_DEV_VAL", "MMMU_TEST"}:
@@ -56,7 +55,7 @@ class Qwen2VLPromptMixin:
         if dataset_type == "MCQ":
             return self._build_mcq_prompt(line, dataset)
         if dataset_type == "Y/N":
-            return self._build_yorn_shots_prompt(line, few_shot_examples, dataset)
+            return self._build_yorn_shots_prompt(line, dataset)
         if dataset_type == "VQA":
             return self._build_vqa_prompt(line, dataset)
         raise ValueError(f"Unsupported dataset: {dataset}")

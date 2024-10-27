@@ -39,6 +39,9 @@ def parse_args():
     parser.add_argument(
         "--retry", type=int, default=None, help="retry numbers for API VLMs"
     )
+    parser.add_argument(
+        "--shots", type=int, default=0, help="retry numbers for API VLMs"
+    )
     # Explicitly Set the Judge Model
     parser.add_argument("--judge", type=str, default=None)
     # Logging Utils
@@ -181,6 +184,7 @@ def main():
                         verbose=args.verbose,
                         api_nproc=args.nproc,
                         ignore_failed=args.ignore,
+                        shots=args.shots,
                     )
 
                 # Set the judge kwargs first before evaluation or dumping
