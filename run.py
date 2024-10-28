@@ -40,7 +40,7 @@ def parse_args():
         "--retry", type=int, default=None, help="retry numbers for API VLMs"
     )
     parser.add_argument(
-        "--shots", type=int, default=0, help="retry numbers for API VLMs"
+        "--shots", type=int, default=0, help="few shots for VLMs,default 0 for all"
     )
     # Explicitly Set the Judge Model
     parser.add_argument("--judge", type=str, default=None)

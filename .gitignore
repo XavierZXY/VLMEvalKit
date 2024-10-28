@@ -165,4 +165,4 @@ scripts/*ttf
 cache_dir/*
 
 # Evaluation Outputs
-outputs/*
+*.xlsx

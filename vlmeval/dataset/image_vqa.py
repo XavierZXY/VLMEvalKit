@@ -731,7 +731,7 @@ class CRPE(ImageBaseDataset):
         return msgs
 
 
-class OpenMI(ImageBaseDataset):
+class OpenMI(ImageVQADataset):
     TYPE = "VQA"
     DATASET_URL = {
         "Open_MI": "https://opencompass.openxlab.space/utils/VLMEval/Open_MI.tsv"
