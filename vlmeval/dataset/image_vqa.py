@@ -753,12 +753,13 @@ class OpenMI(ImageVQADataset):
             pred = line["prediction"].strip().lower().replace(".", "")
             score = 1.0 if ans in pred else 0.0
             total_scores += score
+        total_scores = total_scores / lt
 
         suffix = eval_file.split(".")[-1]
         result_file = eval_file.replace(f".{suffix}", "_acc.json")
         dump(total_scores, result_file)
 
-        return total_scores / lt
+        return total_scores
 
     def build_prompt(self, line, n_shots):
         msgs = []
@@ -814,11 +815,13 @@ class CLEVR(ImageBaseDataset):
             score = 1.0 if ans == pred else 0.0
             total_scores += score
 
+        total_scores = total_scores / lt
+
         suffix = eval_file.split(".")[-1]
         result_file = eval_file.replace(f".{suffix}", "_acc.json")
         dump(total_scores, result_file)
 
-        return total_scores / lt
+        return total_scores
 
     def build_prompt(self, line, n_shots):
         msgs = []

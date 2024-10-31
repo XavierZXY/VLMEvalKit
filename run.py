@@ -84,7 +84,7 @@ def main():
     for _, model_name in enumerate(args.model):
         model = None
 
-        pred_root = osp.join(args.work_dir, model_name)
+        pred_root = osp.join(args.work_dir, model_name, f"shots_{args.shots}")
         os.makedirs(pred_root, exist_ok=True)
 
         for _, dataset_name in enumerate(args.data):
