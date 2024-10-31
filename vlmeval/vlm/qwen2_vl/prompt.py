@@ -43,6 +43,7 @@ class Qwen2VLPromptMixin:
             "MMVet",
             "Open_MI",
             "CLEVR",
+            "Operator_Induction",
         }:  # MMVet VQA has it's own prompt
             return True
         return False

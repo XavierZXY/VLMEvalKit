@@ -27,6 +27,7 @@ from .image_vqa import (
     MTVQADataset,
     OCRBench,
     OpenMI,
+    Operator_Induction,
     TableVQABench,
 )
 from .image_yorn import ImageYORNDataset
@@ -156,6 +157,7 @@ IMAGE_DATASET = [
     MathVerse,
     OpenMI,
     CLEVR,
+    Operator_Induction,
 ]
 
 VIDEO_DATASET = [MMBenchVideo, VideoMME, MVBench, MVBench_MP4]

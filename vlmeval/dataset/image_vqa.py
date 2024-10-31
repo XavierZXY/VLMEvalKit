@@ -879,3 +879,94 @@ class CLEVR(ImageBaseDataset):
             )
         )
         return msgs
+
+
+class Operator_Induction(ImageBaseDataset):
+    TYPE = "VQA"
+    DATASET_URL = {
+        "Operator_Induction": "https://opencompass.openxlab.space/utils/VLMEval/Operator_Induction.tsv"
+    }
+    DATASET_MD5 = {"Operator_Induction": "ad83b63a15b0e1c770c4d3d3d7a45b55"}
+
+    @classmethod
+    def evaluate(self, eval_file, **judge_kwargs):
+        data = load(eval_file)
+        assert "answer" in data and "prediction" in data
+        data["prediction"] = [str(x) for x in data["prediction"]]
+        data["answer"] = [str(x) for x in data["answer"]]
+
+        lt = len(data)
+        total_scores = 0
+        for i in range(lt):
+            line = data.iloc[i]
+            ans = line["answer"].strip().lower().replace(".", "")
+            pred = line["prediction"].strip().lower().replace(".", "")
+            score = 1.0 if ans == pred else 0.0
+            total_scores += score
+
+        total_scores = total_scores / lt
+
+        suffix = eval_file.split(".")[-1]
+        result_file = eval_file.replace(f".{suffix}", "_acc.json")
+        dump(total_scores, result_file)
+
+        return total_scores
+
+    def build_prompt(self, line, n_shots):
+        operator_list = {"+": 0, "-": 1, "x": 2}
+        operator_index = line["operator"]
+
+        msgs = []
+        if n_shots:
+            msgs.append(
+                {
+                    "type": "text",
+                    "value": (
+                        # "The image contains objects of different shapes, colors, sizes and materials. "
+                        # "The question describes the attribute and its value. You need to find all objects within "
+                        # "the image that satisfy the condition. You should induce what operation to use according "
+                        # "to the results of the in-context examples and then calculate the result.\n"
+                        "I will give you some example. Please answer the question based on the examples."
+                    ),
+                }
+            )
+            support = eval(line["support"])
+            target_path = []
+            for item in support:
+                target_path.extend(self.dump_image(item))
+            for i in range(n_shots):
+                msgs.append(
+                    {
+                        "type": "image",
+                        "value": target_path[i],
+                    }
+                )
+                msgs.append(
+                    dict(
+                        type="text",
+                        value=f"Question: {support[i]['question']}\nAnswer: {support[i]['answer'][operator_list[operator_index]]}\n",
+                    )
+                )
+
+        if isinstance(line, int):
+            line = self.data.iloc[line]
+        if self.meta_only:
+            tgt_path = toliststr(line["image_path"])
+        else:
+            tgt_path = self.dump_image(line)
+        question = line["question"]
+        if isinstance(tgt_path, list):
+            msgs.extend([dict(type="image", value=p) for p in tgt_path])
+        else:
+            msgs = [dict(type="image", value=tgt_path)]
+
+        msgs.append(
+            dict(
+                type="text",
+                value=(
+                    # "You need to find all objects within the image that satisfy the condition. "
+                    f"The operator is {operator_index}. {question}\nJust give me the result number."
+                ),
+            )
+        )
+        return msgs
