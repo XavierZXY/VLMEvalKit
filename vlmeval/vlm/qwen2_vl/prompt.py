@@ -42,6 +42,7 @@ class Qwen2VLPromptMixin:
         if dataset_type == "VQA" and dataset not in {
             "MMVet",
             "Open_MI",
+            "CLEVR",
         }:  # MMVet VQA has it's own prompt
             return True
         return False

@@ -166,3 +166,4 @@ cache_dir/*
 
 # Evaluation Outputs
 *.xlsx
+*.pkl

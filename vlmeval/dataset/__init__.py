@@ -15,6 +15,7 @@ from .image_mcq import (
 )
 from .image_mt import MMDUDataset
 from .image_vqa import (
+    CLEVR,
     CRPE,
     CustomVQADataset,
     ImageVQADataset,
@@ -154,6 +155,7 @@ IMAGE_DATASET = [
     CRPE,
     MathVerse,
     OpenMI,
+    CLEVR,
 ]
 
 VIDEO_DATASET = [MMBenchVideo, VideoMME, MVBench, MVBench_MP4]
