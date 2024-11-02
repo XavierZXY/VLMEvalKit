@@ -9,24 +9,26 @@ source .venv/bin/activate &&
 # torchrun --nproc-per-node=6  run.py --data MMBench_DEV_CN_V11 --model Qwen2-VL-7B-Instruct --verbose
 
 
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model InternVL2-8B --verbose --shots=0
 
 # keep retry util success
-for attempt in {0..4}; do
-    # python run.py --data MME --model Qwen2-VL-7B-Instruct --verbose
-    # Open_MI, CLEVR, Operator_Induction
-    # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model qwen_chat --verbose --shots="$attempt"
-    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI Operator_Induction --model Qwen2-VL-2B-Instruct Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
-    # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
-    # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model Qwen2-VL-7B-Instruct --verbose --shots=2
-    # CUDA_VISIBLE_DEVICES=1 python run.py --data BLINK --model Qwen2-VL-7B-Instruct --verbose
-    if [ $? -eq 0 ]; then
-        echo -e "$GREEN Command executed  successfully. Exiting.$NC"
-        sleep 30
-    else
-        echo -e "$RED Command  failed. Retrying in 30 seconds... $NC"
-        # sleep 30 
-    fi
-done
+# for attempt in {0..4}; do
+#     # python run.py --data MME --model Qwen2-VL-7B-Instruct --verbose
+#     # Open_MI, CLEVR, Operator_Inductionqwen_chat Qwen2-VL-2B-Instruct Qwen2-VL-7B-Instruct InternVL2-8B idefics2-8b
+#     # 
+#     CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI CLEVR Operator_Induction --model InternVL2-8B --verbose --shots="$attempt"
+#     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI Operator_Induction --model Qwen2-VL-2B-Instruct Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
+#     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
+#     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model Qwen2-VL-7B-Instruct --verbose --shots=2
+#     # CUDA_VISIBLE_DEVICES=1 python run.py --data BLINK --model Qwen2-VL-7B-Instruct --verbose
+#     if [ $? -eq 0 ]; then
+#         echo -e "$GREEN Command executed  successfully. Exiting.$NC"
+#         sleep 30
+#     else
+#         echo -e "$RED Command  failed. Retrying in 30 seconds... $NC"
+#         # sleep 30 
+#     fi
+# done
 
 # if [ "$attempt" -eq 2 ]; then
 #     echo -e "$RED Maximum attempts reached. Exiting. $NC"
