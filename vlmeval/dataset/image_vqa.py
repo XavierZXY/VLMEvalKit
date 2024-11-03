@@ -810,9 +810,14 @@ class CLEVR(ImageBaseDataset):
         total_scores = 0
         for i in range(lt):
             line = data.iloc[i]
-            ans = line["answer"].strip().lower().replace(".", "")
-            pred = line["prediction"].strip().lower().replace(".", "")
-            score = 1.0 if ans == pred else 0.0
+            ans = line["answer"].strip().lower().rstrip(".")
+            pred = line["prediction"].strip().lower().rstrip(".")
+            try:
+                ans_float = float(ans)
+                pred_float = float(pred)
+                score = 1.0 if ans_float == pred_float else 0.0
+            except ValueError:
+                score = 1.0 if ans == pred else 0.0
             total_scores += score
 
         total_scores = total_scores / lt
@@ -899,9 +904,15 @@ class Operator_Induction(ImageBaseDataset):
         total_scores = 0
         for i in range(lt):
             line = data.iloc[i]
-            ans = line["answer"].strip().lower().replace(".", "")
-            pred = line["prediction"].strip().lower().replace(".", "")
-            score = 1.0 if ans == pred else 0.0
+            ans = line["answer"].strip().lower().rstrip(".")
+            pred = line["prediction"].strip().lower().rstrip(".")
+            try:
+                ans_float = float(ans)
+                pred_float = float(pred)
+                score = 1.0 if ans_float == pred_float else 0.0
+            except ValueError:
+                score = 1.0 if ans == pred else 0.0
+
             total_scores += score
 
         total_scores = total_scores / lt
