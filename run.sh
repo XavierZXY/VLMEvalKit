@@ -12,13 +12,13 @@ source .venv/bin/activate &&
 # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model InternVL2-8B --verbose --shots=0
 
 # keep retry util success
-for attempt in {0..3}; do
+for attempt in {0..4}; do
     # python run.py --data MME --model Qwen2-VL-7B-Instruct --verbose
     # Open_MI, CLEVR, Operator_Induction 
     # qwen_chat Qwen2-VL-2B-Instruct Qwen2-VL-7B-Instruct InternVL2-8B idefics2_8b
     # 
     export OMP_NUM_THREADS=24
-    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=1 run.py --data Open_MI CLEVR Operator_Induction --model idefics2_8b --verbose --shots="$attempt"
+    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI CLEVR Operator_Induction --model InternVL2-8B --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI Operator_Induction --model Qwen2-VL-2B-Instruct Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model Qwen2-VL-7B-Instruct --verbose --shots=2
