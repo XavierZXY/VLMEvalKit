@@ -937,7 +937,7 @@ class Operator_Induction(ImageBaseDataset):
                         # "The question describes the attribute and its value. You need to find all objects within "
                         # "the image that satisfy the condition. You should induce what operation to use according "
                         # "to the results of the in-context examples and then calculate the result.\n"
-                        "I will give you some example. Please answer the question based on the examples."
+                        "I will give you some example.Please reasoning the operator base on the examples then answer the question based on the examples."
                     ),
                 }
             )
@@ -976,7 +976,7 @@ class Operator_Induction(ImageBaseDataset):
                 type="text",
                 value=(
                     # "You need to find all objects within the image that satisfy the condition. "
-                    f"The operator is {operator_index}. {question}\nJust give me the result number."
+                    f"{question}\nJust give me the result number."
                 ),
             )
         )
