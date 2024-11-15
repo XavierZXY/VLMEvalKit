@@ -39,12 +39,10 @@ class Qwen2VLPromptMixin:
             "POPE",
         }:  # MME has it's own prompt
             return True
-        if dataset_type == "VQA" and dataset not in {
-            "MMVet",
-            "Open_MI",
-            "CLEVR",
-            "Operator_Induction",
-        }:  # MMVet VQA has it's own prompt
+        if dataset_type == "VQA" and not any(
+            dataset.startswith(prefix)
+            for prefix in {"MMVet", "Open_MI", "CLEVR", "Operator_Induction"}
+        ):  # MMVet VQA has its own prompt
             return True
         return False
 

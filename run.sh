@@ -18,7 +18,8 @@ for attempt in {0..4}; do
     # Qwen2-VL-2B-Instruct qwen_chat  Qwen2-VL-7B-Instruct InternVL2-8B idefics2_8b
     # 
     export OMP_NUM_THREADS=24
-    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model Qwen2-VL-2B-Instruct qwen_chat Qwen2-VL-7B-Instruct InternVL2-8B idefics2_8b --verbose --shots="$attempt"
+    CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data CLEVR CLEVR_SQ --model Qwen2-VL-2B-Instruct qwen_chat --verbose --shots="$attempt"
+    # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data CLEVR_SQ --model Qwen2-VL-2B-Instruct qwen_chat Qwen2-VL-7B-Instruct InternVL2-8B idefics2_8b --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI Operator_Induction --model Qwen2-VL-2B-Instruct Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model Qwen2-VL-7B-Instruct --verbose --shots=2

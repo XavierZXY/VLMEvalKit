@@ -795,9 +795,13 @@ class OpenMI(ImageVQADataset):
 class CLEVR(ImageBaseDataset):
     TYPE = "VQA"
     DATASET_URL = {
-        "CLEVR": "https://opencompass.openxlab.space/utils/VLMEval/CLEVR.tsv"
+        "CLEVR": "https://opencompass.openxlab.space/utils/VLMEval/CLEVR.tsv",
+        "CLEVR_SQ": "https://opencompass.openxlab.space/utils/VLMEval/CLEVR_SQ.tsv",
     }
-    DATASET_MD5 = {"CLEVR": "6a1d285855eab6438417243e90c0e7e9"}
+    DATASET_MD5 = {
+        "CLEVR": "6a1d285855eab6438417243e90c0e7e9",
+        "CLEVR_SQ": "12854aaa028a22706ab963c711c64ad7",
+    }
 
     @classmethod
     def evaluate(self, eval_file, **judge_kwargs):
