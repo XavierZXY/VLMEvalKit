@@ -800,7 +800,7 @@ class CLEVR(ImageBaseDataset):
     }
     DATASET_MD5 = {
         "CLEVR": "6a1d285855eab6438417243e90c0e7e9",
-        "CLEVR_SQ": "12854aaa028a22706ab963c711c64ad7",
+        "CLEVR_SQ": "1188d0392f1161b3b6bdc4672257849b",
     }
 
     @classmethod

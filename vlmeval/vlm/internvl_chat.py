@@ -220,6 +220,7 @@ class InternVLChat(BaseModel):
                 "MME-RealWorld-CN",
                 "Open_MI",
                 "CLEVR",
+                "CLEVR_SQ",
                 "Operator_Induction",
             ],
             dataset,
