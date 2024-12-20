@@ -31,63 +31,92 @@ def load_data(datasets_path, datasets_name):
     return query, images
 
 
-def retireve_icl_data(query, images, icl_query, icl_image, shots: int = 10):
+def retireve_icl_data(
+    query, images, icl_query, icl_image, path, shots: int = 10, retrieval_method="SQ"
+):
+    def _load_or_extract_features(file_path, data, extract_fn):
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as f:
+                features = pickle.load(f)
+        else:
+            features = extract_fn(data)
+            with open(file_path, "wb") as f:
+                pickle.dump(features, f)
+        return features
+
+    def _extract_text_features(data, model, device):
+        features = dict()
+        for key, text in tqdm(data.items()):
+            tokenized_text = clip.tokenize([text]).to(device)
+            with torch.no_grad():
+                features[key] = model.encode_text(tokenized_text).cpu().numpy()
+        return features
+
+    def _extract_image_features(data, preprocess, model, device):
+        features = dict()
+        for key, img in tqdm(data.items()):
+            image = Image.open(BytesIO(base64.b64decode(img)))
+            image_input = preprocess(image).unsqueeze(0).to(device)
+            with torch.no_grad():
+                features[key] = model.encode_image(image_input).cpu().numpy()
+        return features
+
     # Define the file paths for storing features
-    query_features_file = "query_features.pkl"
-    icl_query_features_file = "icl_query_features.pkl"
+    query_features_file = path + "query_features.pkl"
+    images_features_file = path + "images_features.pkl"
+    icl_query_features_file = path + "icl_query_features.pkl"
+    icl_images_features_file = path + "icl_images_features.pkl"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-B/32", device=device)
 
-    # Check if the query features file exists
-    if os.path.exists(query_features_file):
-        # Load the query features from the file
-        with open(query_features_file, "rb") as f:
-            query_features = pickle.load(f)
-    else:
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        model, preprocess = clip.load("ViT-B/32", device=device)
-        # Extract query features and save to file
-        query_features = dict()
-        for key, q in tqdm(query.items()):
-            text = clip.tokenize([q]).to(device)
-            with torch.no_grad():
-                query_features[key] = model.encode_text(text).cpu().numpy()
+    # Load or extract query features
+    query_features = _load_or_extract_features(
+        query_features_file,
+        query,
+        lambda data: _extract_text_features(data, model, device),
+    )
 
-        # Save the query features to the file
-        with open(query_features_file, "wb") as f:
-            pickle.dump(query_features, f)
+    # Load or extract icl_query features
+    icl_query_features = _load_or_extract_features(
+        icl_query_features_file,
+        icl_query,
+        lambda data: _extract_text_features(data, model, device),
+    )
 
-    # Check if the icl_query features file exists
-    if os.path.exists(icl_query_features_file):
-        # Load the icl_query features from the file
-        with open(icl_query_features_file, "rb") as f:
-            icl_query_features = pickle.load(f)
-    else:
-        # Extract icl_query features and save to file
-        icl_query_features = dict()
-        for key, q in tqdm(icl_query.items()):
-            text = clip.tokenize([q]).to(device)
-            with torch.no_grad():
-                icl_query_features[key] = model.encode_text(text).cpu().numpy()
+    # Load or extract images features
+    images_features = _load_or_extract_features(
+        images_features_file,
+        images,
+        lambda data: _extract_image_features(data, preprocess, model, device),
+    )
 
-        # Save the icl_query features to the file
-        with open(icl_query_features_file, "wb") as f:
-            pickle.dump(icl_query_features, f)
+    # Load or extract icl_images features
+    icl_images_features = _load_or_extract_features(
+        icl_images_features_file,
+        icl_image,
+        lambda data: _extract_image_features(data, preprocess, model, device),
+    )
 
-    # Compute cosine similarity for each query individually
-    top_queries = {}
-    for q_key, q_vector in query_features.items():
-        q_vector = q_vector.squeeze()
-        icl_vectors = np.array(list(icl_query_features.values())).squeeze()
+    if retrieval_method == "SQ":
+        # Compute cosine similarity for each query individually
+        top_queries = {}
+        for q_key, q_vector in query_features.items():
+            q_vector = q_vector.squeeze()
+            icl_vectors = np.array(list(icl_query_features.values())).squeeze()
 
-        similarities = np.dot(icl_vectors, q_vector.T).squeeze()
-        similarities /= np.linalg.norm(icl_vectors, axis=1) * np.linalg.norm(q_vector)
+            similarities = np.dot(icl_vectors, q_vector.T).squeeze()
+            similarities /= np.linalg.norm(icl_vectors, axis=1) * np.linalg.norm(
+                q_vector
+            )
 
-        # Get the indices of the top 'shots' similar queries
-        top_indices = np.argsort(similarities)[-shots:][::-1]
+            # Get the indices of the top 'shots' similar queries
+            top_indices = np.argsort(similarities)[-shots:][::-1]
 
-        # Retrieve the top similar queries
-        top_queries[q_key] = [list(icl_query.keys())[i] for i in top_indices]
-
-    return top_queries
+            # Retrieve the top similar queries
+            top_queries[q_key] = [list(icl_query.keys())[i] for i in top_indices]
+        return top_queries
+    elif retrieval_method == "SI":
+        return None
 
 
 def read_tsv_file(retireve_data):
@@ -176,7 +205,9 @@ def main():
     icl_query, icl_images = load_data(path, support_name)
 
     # get the index of different retireve methods.(SI, SQ, SQA ...)
-    retireve_data = retireve_icl_data(query, images, icl_query, icl_images, shots=10)
+    retireve_data = retireve_icl_data(
+        query, images, icl_query, icl_images, path, shots=10
+    )
     # read tsv file
     # read_tsv_file(retireve_data)
     # generate new tsv data file
