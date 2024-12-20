@@ -21,7 +21,13 @@ def parse_args():
 
 # Only API model is accepted
 def infer_data_api(
-    work_dir, model_name, dataset, index_set=None, api_nproc=4, ignore_failed=False
+    work_dir,
+    model_name,
+    dataset,
+    index_set=None,
+    api_nproc=4,
+    ignore_failed=False,
+    shots=0,
 ):
     rank, world_size = get_rank_and_world_size()
     assert rank == 0 and world_size == 1
@@ -30,7 +36,11 @@ def infer_data_api(
     if index_set is not None:
         data = data[data["index"].isin(index_set)]
 
-    model = supported_VLM[model_name]() if isinstance(model_name, str) else model_name
+    model = (
+        supported_VLM[model_name]()
+        if isinstance(model_name, str)
+        else model_name
+    )
     assert getattr(model, "is_api", False)
     if hasattr(model, "set_dump_image"):
         model.set_dump_image(dataset.dump_image)
@@ -46,7 +56,7 @@ def infer_data_api(
             assert hasattr(model, "build_prompt")
             struct = model.build_prompt(item, dataset=dataset_name)
         else:
-            struct = dataset.build_prompt(item)
+            struct = dataset.build_prompt(item, shots)
         structs.append(struct)
 
     # structs = [dataset.build_prompt(data.iloc[i]) for i in range(lt)]
@@ -111,7 +121,11 @@ def infer_data(
     data = data[~data["index"].isin(res)]
     lt = len(data)
 
-    model = supported_VLM[model_name]() if isinstance(model_name, str) else model_name
+    model = (
+        supported_VLM[model_name]()
+        if isinstance(model_name, str)
+        else model_name
+    )
 
     is_api = getattr(model, "is_api", False)
     if is_api:
@@ -122,6 +136,7 @@ def infer_data(
             dataset=dataset,
             index_set=set(indices),
             api_nproc=api_nproc,
+            shots=shots,
         )
         for idx in indices:
             assert idx in supp
@@ -140,7 +155,9 @@ def infer_data(
         if hasattr(model, "use_custom_prompt") and model.use_custom_prompt(
             dataset_name
         ):
-            struct = model.build_prompt(data.iloc[i], shots, dataset=dataset_name)
+            struct = model.build_prompt(
+                data.iloc[i], shots, dataset=dataset_name
+            )
         else:
             struct = dataset.build_prompt(data.iloc[i], shots)
 
@@ -180,7 +197,9 @@ def infer_data_job(
             data = load(result_file)
             results = {k: v for k, v in zip(data["index"], data["prediction"])}
             if not ignore_failed:
-                results = {k: v for k, v in results.items() if FAIL_MSG not in str(v)}
+                results = {
+                    k: v for k, v in results.items() if FAIL_MSG not in str(v)
+                }
             dump(results, prev_file)
         if world_size > 1:
             dist.barrier()

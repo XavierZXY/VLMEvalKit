@@ -17,7 +17,9 @@ RBDash_ROOT = None
 LLAVA_V1_7B_MODEL_PTH = "Please set your local path to LLaVA-7B-v1.1 here, the model weight is obtained by merging LLaVA delta weight based on vicuna-7b-v1.1 in https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md with vicuna-7b-v1.1. "
 
 video_models = {
-    "Video-LLaVA-7B": partial(VideoLLaVA, model_path="LanguageBind/Video-LLaVA-7B"),
+    "Video-LLaVA-7B": partial(
+        VideoLLaVA, model_path="LanguageBind/Video-LLaVA-7B"
+    ),
     "Video-LLaVA-7B-HF": partial(
         VideoLLaVA_HF, model_path="LanguageBind/Video-LLaVA-7B-hf"
     ),
@@ -35,9 +37,13 @@ video_models = {
         LLaMAVID, model_path="YanweiLi/llama-vid-7b-full-224-video-fps-1"
     ),
     "Video-ChatGPT": partial(
-        VideoChatGPT, model_path="MBZUAI/Video-ChatGPT-7B", dir_root=VideoChatGPT_ROOT
+        VideoChatGPT,
+        model_path="MBZUAI/Video-ChatGPT-7B",
+        dir_root=VideoChatGPT_ROOT,
     ),
-    "PLLaVA-7B": partial(PLLaVA, model_path="ermu2001/pllava-7b", dir_root=PLLaVA_ROOT),
+    "PLLaVA-7B": partial(
+        PLLaVA, model_path="ermu2001/pllava-7b", dir_root=PLLaVA_ROOT
+    ),
     "PLLaVA-13B": partial(
         PLLaVA, model_path="ermu2001/pllava-13b", dir_root=PLLaVA_ROOT
     ),
@@ -56,7 +62,9 @@ ungrouped = {
         ckpt_pth="openflamingo/OpenFlamingo-9B-vitl-mpt7b",
     ),
     "VisualGLM_6b": partial(VisualGLM, model_path="THUDM/visualglm-6b"),
-    "mPLUG-Owl2": partial(mPLUG_Owl2, model_path="MAGAer13/mplug-owl2-llama2-7b"),
+    "mPLUG-Owl2": partial(
+        mPLUG_Owl2, model_path="MAGAer13/mplug-owl2-llama2-7b"
+    ),
     "mPLUG-Owl3": partial(mPLUG_Owl3, model_path="mPLUG/mPLUG-Owl3-7B-240728"),
     "emu2_chat": partial(Emu, model_path="BAAI/Emu2-Chat"),
     "OmniLMM_12B": partial(
@@ -65,7 +73,9 @@ ungrouped = {
     "MGM_7B": partial(
         Mini_Gemini, model_path="YanweiLi/MGM-7B-HD", root=Mini_Gemini_ROOT
     ),
-    "Bunny-llama3-8B": partial(BunnyLLama3, model_path="BAAI/Bunny-v1_1-Llama-3-8B-V"),
+    "Bunny-llama3-8B": partial(
+        BunnyLLama3, model_path="BAAI/Bunny-v1_1-Llama-3-8B-V"
+    ),
     "VXVERSE": partial(VXVERSE, model_name="XVERSE-V-13B", root=VXVERSE_ROOT),
     "paligemma-3b-mix-448": partial(
         PaliGemma, model_path="google/paligemma-3b-mix-448"
@@ -86,7 +96,7 @@ api_models = {
     # GPT
     "GPT4V": partial(
         GPT4V,
-        model="gpt-4-1106-vision-preview",
+        model="Qwen2-VL-7B-Instruct",
         temperature=0,
         img_size=512,
         img_detail="low",
@@ -159,8 +169,12 @@ api_models = {
         GeminiProVision, model="gemini-1.5-flash", temperature=0, retry=10
     ),
     # Qwen-VL
-    "QwenVLPlus": partial(QwenVLAPI, model="qwen-vl-plus", temperature=0, retry=10),
-    "QwenVLMax": partial(QwenVLAPI, model="qwen-vl-max", temperature=0, retry=10),
+    "QwenVLPlus": partial(
+        QwenVLAPI, model="qwen-vl-plus", temperature=0, retry=10
+    ),
+    "QwenVLMax": partial(
+        QwenVLAPI, model="qwen-vl-max", temperature=0, retry=10
+    ),
     # Reka
     "RekaEdge": partial(Reka, model="reka-edge-20240208"),
     "RekaFlash": partial(Reka, model="reka-flash-20240226"),
@@ -197,9 +211,13 @@ api_models = {
         Claude3V, model="claude-3-5-sonnet-20240620", temperature=0, retry=10
     ),
     # GLM4V
-    "GLM4V": partial(GLMVisionAPI, model="glm4v-biz-eval", temperature=0, retry=10),
+    "GLM4V": partial(
+        GLMVisionAPI, model="glm4v-biz-eval", temperature=0, retry=10
+    ),
     # CongRong
-    "CloudWalk": partial(CWWrapper, model="cw-congrong-v1.5", temperature=0, retry=10),
+    "CloudWalk": partial(
+        CWWrapper, model="cw-congrong-v1.5", temperature=0, retry=10
+    ),
     # SenseChat-V
     "SenseChat-5-Vision": partial(
         SenseChatVisionAPI, model="SenseChat-5-Vision", temperature=0, retry=10
@@ -208,7 +226,9 @@ api_models = {
         HunyuanVision, model="hunyuan-vision", temperature=0, retry=10
     ),
     # BlueLM-V
-    "BlueLM_V": partial(BlueLM_V_API, model="BlueLM-VL-v3.0", temperature=0, retry=10),
+    "BlueLM_V": partial(
+        BlueLM_V_API, model="BlueLM-VL-v3.0", temperature=0, retry=10
+    ),
 }
 
 mmalaya_series = {
@@ -293,12 +313,18 @@ llava_series = {
     "llava_next_mistral_7b": partial(
         LLaVA_Next, model_path="llava-hf/llava-v1.6-mistral-7b-hf"
     ),
-    "llava_next_yi_34b": partial(LLaVA_Next, model_path="llava-hf/llava-v1.6-34b-hf"),
+    "llava_next_yi_34b": partial(
+        LLaVA_Next, model_path="llava-hf/llava-v1.6-34b-hf"
+    ),
     "llava_next_llama3": partial(
         LLaVA_Next, model_path="llava-hf/llama3-llava-next-8b-hf"
     ),
-    "llava_next_72b": partial(LLaVA_Next, model_path="llava-hf/llava-next-72b-hf"),
-    "llava_next_110b": partial(LLaVA_Next, model_path="llava-hf/llava-next-110b-hf"),
+    "llava_next_72b": partial(
+        LLaVA_Next, model_path="llava-hf/llava-next-72b-hf"
+    ),
+    "llava_next_110b": partial(
+        LLaVA_Next, model_path="llava-hf/llava-next-110b-hf"
+    ),
     "llava_next_qwen_32b": partial(
         LLaVA_Next2, model_path="lmms-lab/llava-next-qwen-32b"
     ),
@@ -336,16 +362,22 @@ internvl_series = {
         InternVLChat, model_path="OpenGVLab/InternVL-Chat-V1-2", version="V1.2"
     ),
     "InternVL-Chat-V1-2-Plus": partial(
-        InternVLChat, model_path="OpenGVLab/InternVL-Chat-V1-2-Plus", version="V1.2"
+        InternVLChat,
+        model_path="OpenGVLab/InternVL-Chat-V1-2-Plus",
+        version="V1.2",
     ),
     "InternVL-Chat-V1-5": partial(
         InternVLChat, model_path="OpenGVLab/InternVL-Chat-V1-5", version="V1.5"
     ),
     "Mini-InternVL-Chat-2B-V1-5": partial(
-        InternVLChat, model_path="OpenGVLab/Mini-InternVL-Chat-2B-V1-5", version="V1.5"
+        InternVLChat,
+        model_path="OpenGVLab/Mini-InternVL-Chat-2B-V1-5",
+        version="V1.5",
     ),
     "Mini-InternVL-Chat-4B-V1-5": partial(
-        InternVLChat, model_path="OpenGVLab/Mini-InternVL-Chat-4B-V1-5", version="V1.5"
+        InternVLChat,
+        model_path="OpenGVLab/Mini-InternVL-Chat-4B-V1-5",
+        version="V1.5",
     ),
     # InternVL2 series
     "InternVL2-1B": partial(
@@ -380,9 +412,15 @@ yivl_series = {
 }
 
 xcomposer_series = {
-    "XComposer": partial(XComposer, model_path="internlm/internlm-xcomposer-vl-7b"),
-    "sharecaptioner": partial(ShareCaptioner, model_path="Lin-Chen/ShareCaptioner"),
-    "XComposer2": partial(XComposer2, model_path="internlm/internlm-xcomposer2-vl-7b"),
+    "XComposer": partial(
+        XComposer, model_path="internlm/internlm-xcomposer-vl-7b"
+    ),
+    "sharecaptioner": partial(
+        ShareCaptioner, model_path="Lin-Chen/ShareCaptioner"
+    ),
+    "XComposer2": partial(
+        XComposer2, model_path="internlm/internlm-xcomposer2-vl-7b"
+    ),
     "XComposer2_1.8b": partial(
         XComposer2, model_path="internlm/internlm-xcomposer2-vl-1_8b"
     ),
@@ -420,7 +458,9 @@ instructblip_series = {
 }
 
 deepseekvl_series = {
-    "deepseek_vl_7b": partial(DeepSeekVL, model_path="deepseek-ai/deepseek-vl-7b-chat"),
+    "deepseek_vl_7b": partial(
+        DeepSeekVL, model_path="deepseek-ai/deepseek-vl-7b-chat"
+    ),
     "deepseek_vl_1.3b": partial(
         DeepSeekVL, model_path="deepseek-ai/deepseek-vl-1.3b-chat"
     ),
@@ -433,7 +473,9 @@ cogvlm_series = {
         tokenizer_name="lmsys/vicuna-7b-v1.5",
     ),
     "cogvlm-chat": partial(
-        CogVlm, model_path="THUDM/cogvlm-chat-hf", tokenizer_name="lmsys/vicuna-7b-v1.5"
+        CogVlm,
+        model_path="THUDM/cogvlm-chat-hf",
+        tokenizer_name="lmsys/vicuna-7b-v1.5",
     ),
     "cogvlm2-llama3-chat-19B": partial(
         CogVlm, model_path="THUDM/cogvlm2-llama3-chat-19B"
@@ -468,7 +510,9 @@ vila_series = {
 ovis_series = {
     "Ovis1.5-Llama3-8B": partial(Ovis, model_path="AIDC-AI/Ovis1.5-Llama3-8B"),
     "Ovis1.5-Gemma2-9B": partial(Ovis, model_path="AIDC-AI/Ovis1.5-Gemma2-9B"),
-    "Ovis1.6-Gemma2-9B": partial(Ovis1_6, model_path="AIDC-AI/Ovis1.6-Gemma2-9B"),
+    "Ovis1.6-Gemma2-9B": partial(
+        Ovis1_6, model_path="AIDC-AI/Ovis1.6-Gemma2-9B"
+    ),
 }
 
 mantis_series = {
@@ -478,7 +522,9 @@ mantis_series = {
     "Mantis-8B-clip-llama3": partial(
         Mantis, model_path="TIGER-Lab/Mantis-8B-clip-llama3"
     ),
-    "Mantis-8B-Idefics2": partial(Mantis, model_path="TIGER-Lab/Mantis-8B-Idefics2"),
+    "Mantis-8B-Idefics2": partial(
+        Mantis, model_path="TIGER-Lab/Mantis-8B-Idefics2"
+    ),
     "Mantis-8B-Fuyu": partial(Mantis, model_path="TIGER-Lab/Mantis-8B-Fuyu"),
 }
 
@@ -493,7 +539,8 @@ phi3_series = {
 
 xgen_mm_series = {
     "xgen-mm-phi3-interleave-r-v1.5": partial(
-        XGenMM, model_path="Salesforce/xgen-mm-phi3-mini-instruct-interleave-r-v1.5"
+        XGenMM,
+        model_path="Salesforce/xgen-mm-phi3-mini-instruct-interleave-r-v1.5",
     ),
     "xgen-mm-phi3-dpo-r-v1.5": partial(
         XGenMM, model_path="Salesforce/xgen-mm-phi3-mini-instruct-dpo-r-v1.5"
@@ -604,7 +651,9 @@ molmo_series = {
     "molmo-7B-O-0924": partial(molmo, model_path="allenai/Molmo-7B-O-0924"),
 }
 
-kosmos_series = {"Kosmos2": partial(Kosmos2, model_path="/root/kosmos-2-patch14-224")}
+kosmos_series = {
+    "Kosmos2": partial(Kosmos2, model_path="/root/kosmos-2-patch14-224")
+}
 
 points_series = {
     "POINTS-Yi-1.5-9B-Chat": partial(
