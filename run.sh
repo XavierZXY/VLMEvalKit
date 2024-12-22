@@ -18,7 +18,7 @@ for attempt in {0..10}; do
     # Qwen2-VL-2B-Instruct qwen_chat  Qwen2-VL-7B-Instruct InternVL2-8B idefics2_8b
     # 
     export OMP_NUM_THREADS=24
-    python run.py --data Open_MI --model GPT4V --verbose --shots="$attempt"
+    python run.py --data CLEVR_HERDING --model GPT4V --verbose --shots="$attempt"
     # python run.py --data BLINK --model GPT4V --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data CLEVR CLEVR_SQ --model Qwen2-VL-2B-Instruct qwen_chat --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data CLEVR_SQ --model Qwen2-VL-7B-Instruct --verbose --shots="$attempt"

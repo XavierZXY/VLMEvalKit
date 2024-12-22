@@ -23,8 +23,12 @@ def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
     transform = T.Compose(
         [
-            T.Lambda(lambda img: img.convert("RGB") if img.mode != "RGB" else img),
-            T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
+            T.Lambda(
+                lambda img: img.convert("RGB") if img.mode != "RGB" else img
+            ),
+            T.Resize(
+                (input_size, input_size), interpolation=InterpolationMode.BICUBIC
+            ),
             T.ToTensor(),
             T.Normalize(mean=MEAN, std=STD),
         ]
@@ -32,7 +36,9 @@ def build_transform(input_size):
     return transform
 
 
-def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height, image_size):
+def find_closest_aspect_ratio(
+    aspect_ratio, target_ratios, width, height, image_size
+):
     best_ratio_diff = float("inf")
     best_ratio = (1, 1)
     area = width * height
@@ -221,13 +227,16 @@ class InternVLChat(BaseModel):
                 "Open_MI",
                 "CLEVR",
                 "CLEVR_SQ",
+                "CLEVR_HERDING",
                 "Operator_Induction",
             ],
             dataset,
         ):
             # For Multi-Turn we don't have custom prompt
             return False
-        if listinstr(["MMBench-Video", "Video-MME", "MVBench", "Video"], dataset):
+        if listinstr(
+            ["MMBench-Video", "Video-MME", "MVBench", "Video"], dataset
+        ):
             # For Video benchmarks we don't have custom prompt at here
             return False
         else:
@@ -235,7 +244,11 @@ class InternVLChat(BaseModel):
 
     def build_multi_choice_prompt(self, line, dataset=None):
         question = line["question"]
-        hint = line["hint"] if ("hint" in line and not pd.isna(line["hint"])) else None
+        hint = (
+            line["hint"]
+            if ("hint" in line and not pd.isna(line["hint"]))
+            else None
+        )
         if hint is not None:
             question = hint + "\n" + question
 
@@ -275,9 +288,7 @@ class InternVLChat(BaseModel):
             prompt = prompt.replace("\nAnswer:", "")
         elif listinstr(["Video-MME"], dataset):
             prompt = prompt.replace("\nAnswer:", "")
-            prompt += (
-                "\nAnswer with the option's letter from the given choices directly."
-            )
+            prompt += "\nAnswer with the option's letter from the given choices directly."
         elif listinstr(["MVBench"], dataset):
             prompt = prompt.replace("Best option:(", "")
 
@@ -302,7 +313,8 @@ class InternVLChat(BaseModel):
             question = line["question"]
             if listinstr(["MME"], dataset):
                 prompt = (
-                    question + " Answer the question using a single word or phrase."
+                    question
+                    + " Answer the question using a single word or phrase."
                 )
             elif listinstr(["HallusionBench"], dataset):
                 prompt = (
@@ -316,7 +328,14 @@ class InternVLChat(BaseModel):
         elif dataset is not None and DATASET_TYPE(dataset) == "VQA":
             question = line["question"]
             if listinstr(
-                ["MathVista", "MathVision", "VCR", "MTVQA", "MMVet", "MathVerse"],
+                [
+                    "MathVista",
+                    "MathVision",
+                    "VCR",
+                    "MTVQA",
+                    "MMVet",
+                    "MathVerse",
+                ],
                 dataset,
             ):
                 prompt = question
@@ -324,7 +343,8 @@ class InternVLChat(BaseModel):
                 prompt = question + "\nAnswer this question in detail."
             else:
                 prompt = (
-                    question + "\nAnswer the question using a single word or phrase."
+                    question
+                    + "\nAnswer the question using a single word or phrase."
                 )
         else:
             prompt = line["question"]
@@ -369,7 +389,9 @@ class InternVLChat(BaseModel):
         image = Image.open(image_path).convert("RGB")
         image = image.resize((self.image_size, self.image_size))
         image_processor = CLIPImageProcessor.from_pretrained(self.model_path)
-        pixel_values = image_processor(images=image, return_tensors="pt").pixel_values
+        pixel_values = image_processor(
+            images=image, return_tensors="pt"
+        ).pixel_values
         pixel_values = pixel_values.to(torch.bfloat16).to(self.device)
         with torch.no_grad():
             response = self.model.chat(
@@ -450,7 +472,9 @@ class InternVLChat(BaseModel):
                     and listinstr(["MMMU_DEV_VAL"], dataset)
                 )
                 curr_pixel_values = (
-                    load_image(file_name, max_num=self.max_num, upscale=upscale_flag)
+                    load_image(
+                        file_name, max_num=self.max_num, upscale=upscale_flag
+                    )
                     .to(self.device)
                     .to(torch.bfloat16)
                 )
@@ -461,7 +485,9 @@ class InternVLChat(BaseModel):
             image_path = [x["value"] for x in message if x["type"] == "image"][0]
             upscale_flag = listinstr(["MMMU_DEV_VAL"], dataset)
             pixel_values = (
-                load_image(image_path, max_num=self.max_num, upscale=upscale_flag)
+                load_image(
+                    image_path, max_num=self.max_num, upscale=upscale_flag
+                )
                 .to(self.device)
                 .to(torch.bfloat16)
             )
@@ -504,7 +530,9 @@ class InternVLChat(BaseModel):
             for item in tilist:
                 # Substitute the pattern in the text
                 if item["type"] == "text":
-                    prompt += re.sub(self.pattern, self.replacement, item["value"])
+                    prompt += re.sub(
+                        self.pattern, self.replacement, item["value"]
+                    )
                 elif item["type"] == "image":
                     image_cnt += 1
                     prompt += "<image>\n"
@@ -517,7 +545,9 @@ class InternVLChat(BaseModel):
         for i in range(len(message) // 2):
             m1, m2 = message[2 * i], message[2 * i + 1]
             assert m1["role"] == "user" and m2["role"] == "assistant"
-            history.append((concat_tilist(m1["content"]), concat_tilist(m2["content"])))
+            history.append(
+                (concat_tilist(m1["content"]), concat_tilist(m2["content"]))
+            )
 
         return history, image_path, image_cnt
 
@@ -542,7 +572,9 @@ class InternVLChat(BaseModel):
         else:
             for msg in current_msg["content"]:
                 if msg["type"] == "text":
-                    question += re.sub(self.pattern, self.replacement, msg["value"])
+                    question += re.sub(
+                        self.pattern, self.replacement, msg["value"]
+                    )
                 elif msg["type"] == "image":
                     image_cnt += 1
                     question += "<image>\n"
@@ -558,7 +590,9 @@ class InternVLChat(BaseModel):
                     and listinstr(["MMMU_DEV_VAL"], dataset)
                 )
                 curr_pixel_values = (
-                    load_image(file_name, max_num=self.max_num, upscale=upscale_flag)
+                    load_image(
+                        file_name, max_num=self.max_num, upscale=upscale_flag
+                    )
                     .to(self.device)
                     .to(torch.bfloat16)
                 )
@@ -568,7 +602,9 @@ class InternVLChat(BaseModel):
         elif image_cnt == 1:
             upscale_flag = listinstr(["MMMU_DEV_VAL"], dataset)
             pixel_values = (
-                load_image(image_path, max_num=self.max_num, upscale=upscale_flag)
+                load_image(
+                    image_path, max_num=self.max_num, upscale=upscale_flag
+                )
                 .to(self.device)
                 .to(torch.bfloat16)
             )
@@ -587,7 +623,9 @@ class InternVLChat(BaseModel):
             return_history=True,
         )
 
-        response = re.sub(self.reverse_pattern, self.reverse_replacement, response)
+        response = re.sub(
+            self.reverse_pattern, self.reverse_replacement, response
+        )
 
         return response
 
@@ -595,9 +633,13 @@ class InternVLChat(BaseModel):
         self.set_max_num(dataset)
 
         if self.version in ["V1.1", "V1.2"]:
-            raise ValueError(f"Unsupported version for Multi-Turn: {self.version}")
+            raise ValueError(
+                f"Unsupported version for Multi-Turn: {self.version}"
+            )
         elif self.version == "V1.5":
-            raise ValueError(f"Unsupported version for Multi-Turn: {self.version}")
+            raise ValueError(
+                f"Unsupported version for Multi-Turn: {self.version}"
+            )
         elif self.version == "V2.0":
             kwargs_default = dict(
                 do_sample=False, max_new_tokens=512, top_p=None, num_beams=1
@@ -605,4 +647,6 @@ class InternVLChat(BaseModel):
             self.kwargs = kwargs_default
             return self.chat_inner_v2(message, dataset)
         else:
-            raise ValueError(f"Unsupported version for Multi-Turn: {self.version}")
+            raise ValueError(
+                f"Unsupported version for Multi-Turn: {self.version}"
+            )

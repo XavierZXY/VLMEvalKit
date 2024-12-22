@@ -36,7 +36,9 @@ class ImageVQADataset(ImageBaseDataset):
     def build_prompt(self, line):
         msgs = super().build_prompt(line)
         assert msgs[-1]["type"] == "text"
-        msgs[-1]["value"] += "\nAnswer the question using a single word or phrase."
+        msgs[-1]["value"] += (
+            "\nAnswer the question using a single word or phrase."
+        )
         return msgs
 
     # It returns a DataFrame
@@ -54,7 +56,9 @@ class ImageVQADataset(ImageBaseDataset):
         if listinstr(["TextVQA"], dataset):
             res = pool.map(partial(process_line, method="vqa_score"), lines)
         elif listinstr(["ChartQA"], dataset):
-            res = pool.map(partial(process_line, method="relaxed_accuracy"), lines)
+            res = pool.map(
+                partial(process_line, method="relaxed_accuracy"), lines
+            )
         elif listinstr(["OCRVQA", "GQA"], dataset):
             res = pool.map(partial(process_line, method="accuracy"), lines)
         elif listinstr(["DocVQA", "InfoVQA"], dataset):
@@ -125,7 +129,9 @@ class OCRBench(ImageBaseDataset):
             category = line["category"]
             if category == "Handwritten Mathematical Expression Recognition":
                 for j in range(len(answers)):
-                    answer = answers[j].strip().replace("\n", " ").replace(" ", "")
+                    answer = (
+                        answers[j].strip().replace("\n", " ").replace(" ", "")
+                    )
                     predict = predict.strip().replace("\n", " ").replace(" ", "")
                     if answer in predict:
                         OCRBench_score[category] += 1
@@ -194,7 +200,8 @@ class MathVista(ImageBaseDataset):
             data = load(eval_file)
             model = build_judge(max_tokens=128, **judge_kwargs)
             assert model.working(), (
-                "MathVista evaluation requires a working OPENAI API\n" + DEBUG_MESSAGE
+                "MathVista evaluation requires a working OPENAI API\n"
+                + DEBUG_MESSAGE
             )
             lt = len(data)
             lines = [data.iloc[i] for i in range(lt)]
@@ -219,7 +226,9 @@ class MathVista(ImageBaseDataset):
                 ans = load(tmp_file)
                 for k, v in zip(indices, new_results):
                     assert k in ans
-                    assert ans[k]["log"] == v["log"] and ans[k]["res"] == v["res"]
+                    assert (
+                        ans[k]["log"] == v["log"] and ans[k]["res"] == v["res"]
+                    )
 
             data["res"] = [ans[idx]["res"] for idx in data["index"]]
             data["log"] = [ans[idx]["log"] for idx in data["index"]]
@@ -261,8 +270,12 @@ class MathVerse(ImageBaseDataset):
 
         model = judge_kwargs["model"]
         suffix = eval_file.split(".")[-1]
-        storage_extract = eval_file.replace(f".{suffix}", f"_{model}_extract.xlsx")
-        tmp_file_extract = eval_file.replace(f".{suffix}", f"_{model}_extract.pkl")
+        storage_extract = eval_file.replace(
+            f".{suffix}", f"_{model}_extract.xlsx"
+        )
+        tmp_file_extract = eval_file.replace(
+            f".{suffix}", f"_{model}_extract.pkl"
+        )
         storage_score = eval_file.replace(f".{suffix}", f"_{model}_score.xlsx")
         tmp_file_score = eval_file.replace(f".{suffix}", f"_{model}_score.pkl")
         nproc = judge_kwargs.pop("nproc", 4)
@@ -271,7 +284,8 @@ class MathVerse(ImageBaseDataset):
             data = load(eval_file)
             model = build_judge(max_tokens=128, **judge_kwargs)
             assert model.working(), (
-                "MathVerse evaluation requires a working OPENAI API\n" + DEBUG_MESSAGE
+                "MathVerse evaluation requires a working OPENAI API\n"
+                + DEBUG_MESSAGE
             )
             lt = len(data)
             lines = [data.iloc[i] for i in range(lt)]
@@ -302,7 +316,9 @@ class MathVerse(ImageBaseDataset):
                     )
 
             data["extract"] = [ans[idx]["extract"] for idx in data["index"]]
-            data["log_extract"] = [ans[idx]["log_extract"] for idx in data["index"]]
+            data["log_extract"] = [
+                ans[idx]["log_extract"] for idx in data["index"]
+            ]
             dump(data, storage_extract)
 
         # stage2: score the answer
@@ -310,7 +326,8 @@ class MathVerse(ImageBaseDataset):
             data = load(storage_extract)
             model = build_judge(max_tokens=128, **judge_kwargs)
             assert model.working(), (
-                "MathVerse evaluation requires a working OPENAI API\n" + DEBUG_MESSAGE
+                "MathVerse evaluation requires a working OPENAI API\n"
+                + DEBUG_MESSAGE
             )
             lt = len(data)
             lines = [data.iloc[i] for i in range(lt)]
@@ -379,7 +396,8 @@ class MathVision(ImageBaseDataset):
             data = load(eval_file)
             model = build_judge(max_tokens=128, **judge_kwargs)
             assert model.working(), (
-                "MATH-Vision evaluation requires a working OPENAI API\n" + DEBUG_MESSAGE
+                "MATH-Vision evaluation requires a working OPENAI API\n"
+                + DEBUG_MESSAGE
             )
             lt = len(data)
             lines = [data.iloc[i] for i in range(lt)]
@@ -404,7 +422,9 @@ class MathVision(ImageBaseDataset):
                 ans = load(tmp_file)
                 for k, v in zip(indices, new_results):
                     assert k in ans
-                    assert ans[k]["log"] == v["log"] and ans[k]["res"] == v["res"]
+                    assert (
+                        ans[k]["log"] == v["log"] and ans[k]["res"] == v["res"]
+                    )
 
             data["res"] = [ans[idx]["res"] for idx in data["index"]]
             data["log"] = [ans[idx]["log"] for idx in data["index"]]
@@ -445,7 +465,8 @@ class LLaVABench(ImageBaseDataset):
                 temperature=0.2, system_prompt=system_prompt, **judge_kwargs
             )
             assert model.working(), (
-                "LLaVABench evaluation requires a working OPENAI API\n" + DEBUG_MESSAGE
+                "LLaVABench evaluation requires a working OPENAI API\n"
+                + DEBUG_MESSAGE
             )
 
             prompts = [build_prompt(line) for line in lines]
@@ -484,7 +505,8 @@ class MMVet(ImageBaseDataset):
             data = load(eval_file)
             model = build_judge(max_tokens=3, **judge_kwargs)
             assert model.working(), (
-                "MMVet evaluation requires a working OPENAI API\n" + DEBUG_MESSAGE
+                "MMVet evaluation requires a working OPENAI API\n"
+                + DEBUG_MESSAGE
             )
 
             lt = len(data)
@@ -508,7 +530,10 @@ class MMVet(ImageBaseDataset):
                 ans = load(tmp_file)
                 for k, v in zip(indices, new_results):
                     assert k in ans
-                    assert ans[k]["log"] == v["log"] and ans[k]["score"] == v["score"]
+                    assert (
+                        ans[k]["log"] == v["log"]
+                        and ans[k]["score"] == v["score"]
+                    )
             data["score"] = [ans[idx]["score"] for idx in data["index"]]
             data["log"] = [ans[idx]["log"] for idx in data["index"]]
             dump(data, storage)
@@ -579,7 +604,11 @@ class TableVQABench(ImageBaseDataset):
     }
     DATASET_MD5 = {"TableVQABench": "2550adc61bdc82d8e62f3b003de7c62d"}
 
-    from .utils.tablevqabench import FINTABNETQA_PROMPT, VTABFACT_PROMPT, VWTQ_PROMPT
+    from .utils.tablevqabench import (
+        FINTABNETQA_PROMPT,
+        VTABFACT_PROMPT,
+        VWTQ_PROMPT,
+    )
 
     # It returns a DataFrame
     @classmethod
@@ -595,7 +624,9 @@ class TableVQABench(ImageBaseDataset):
         data = load(eval_file)
         assert "answer" in data and "prediction" in data
 
-        data["prediction"] = data["prediction"].str.replace("^Answer: ", "", regex=True)
+        data["prediction"] = data["prediction"].str.replace(
+            "^Answer: ", "", regex=True
+        )
         data_group = dict(tuple(data.groupby("split")))
         eval_result = {"split": [], "average_scores": []}
         for split in ["fintabnetqa", "vtabfact", "vwtq", "vwtq_syn"]:
@@ -607,7 +638,9 @@ class TableVQABench(ImageBaseDataset):
             elif split == "vwtq" or split == "vwtq_syn":
                 split_eval_meta = evaluate_wtq(data_split, ["accuracy"])
             eval_result["split"].append(split)
-            eval_result["average_scores"].append(split_eval_meta["average_scores"])
+            eval_result["average_scores"].append(
+                split_eval_meta["average_scores"]
+            )
 
         suffix = eval_file.split(".")[-1]
         result_file = eval_file.replace(f".{suffix}", "_acc.csv")
@@ -797,10 +830,12 @@ class CLEVR(ImageBaseDataset):
     DATASET_URL = {
         "CLEVR": "https://opencompass.openxlab.space/utils/VLMEval/CLEVR.tsv",
         "CLEVR_SQ": "https://opencompass.openxlab.space/utils/VLMEval/CLEVR_SQ.tsv",
+        "CLEVR_HERDING": "https://opencompass.openxlab.space/utils/VLMEval/CLEVR_HERDING.tsv",
     }
     DATASET_MD5 = {
         "CLEVR": "6a1d285855eab6438417243e90c0e7e9",
         "CLEVR_SQ": "1188d0392f1161b3b6bdc4672257849b",
+        "CLEVR_HERDING": "5264fea02a24fdea90969da5dc192dce",
     }
 
     @classmethod
