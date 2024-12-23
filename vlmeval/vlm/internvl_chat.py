@@ -225,6 +225,7 @@ class InternVLChat(BaseModel):
                 "MME-RealWorld",
                 "MME-RealWorld-CN",
                 "Open_MI",
+                "OPEN_MI_HERDING",
                 "CLEVR",
                 "CLEVR_SQ",
                 "CLEVR_HERDING",

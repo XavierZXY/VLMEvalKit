@@ -19,7 +19,9 @@ def load_data(datasets_path, datasets_name):
     images = dict()
     # open tsv file
     csv.field_size_limit(10000000)
-    with open(datasets_path + datasets_name + ".tsv", "r", encoding="utf-8") as tsvfile:
+    with open(
+        datasets_path + datasets_name + ".tsv", "r", encoding="utf-8"
+    ) as tsvfile:
         # 创建一个csv.reader对象，指定制表符为字段分隔符
         tsvreader = csv.reader(tsvfile, delimiter="\t")
         headers = next(tsvreader)
@@ -32,7 +34,13 @@ def load_data(datasets_path, datasets_name):
 
 
 def retireve_icl_data(
-    query, images, icl_query, icl_image, path, shots: int = 10, retrieval_method="SQ"
+    query,
+    images,
+    icl_query,
+    icl_image,
+    path,
+    shots: int = 10,
+    retrieval_method="SQ",
 ):
     def _load_or_extract_features(file_path, data, extract_fn):
         if os.path.exists(file_path):
@@ -189,9 +197,11 @@ def generate_tsv_file(retireve_data, path, query_name, support_name):
 def main():
     # Change the current working directory to the directory of this script
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    # path = "./datasets/clevr/"
-    # path = "./datasets/open_mi/"
-    path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
+    # path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
+    path = (
+        "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/open_mi/"
+    )
+    # path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
     # datasets_name = "Open_MI.tsv"
     query_name = "query"
     support_name = "support"

@@ -767,9 +767,14 @@ class CRPE(ImageBaseDataset):
 class OpenMI(ImageVQADataset):
     TYPE = "VQA"
     DATASET_URL = {
-        "Open_MI": "https://opencompass.openxlab.space/utils/VLMEval/Open_MI.tsv"
+        "Open_MI": "https://opencompass.openxlab.space/utils/VLMEval/Open_MI.tsv",
+        "OPEN_MI_HERDING": "https://opencompass.openxlab.space/utils/VLMEval/OPEN_MI_HERDING.tsv",
     }
-    DATASET_MD5 = {"Open_MI": "722f4c41b621c1b7b7de9b7c044cf4aa"}
+    DATASET_MD5 = {
+        # "Open_MI": "722f4c41b621c1b7b7de9b7c044cf4aa",
+        "Open_MI": "0ea3ccb3a3b78823e32117466cc7f60e",
+        "OPEN_MI_HERDING": "d5817238d1cfdb0b3c59de1ca851dd2d",
+    }
 
     @classmethod
     def evaluate(self, eval_file, **judge_kwargs):
@@ -805,8 +810,10 @@ class OpenMI(ImageVQADataset):
             )
             support = eval(line["support"])
             current_class = line["answer"]
-
-            target_path = self.dump_image(support[current_class])
+            target_path = []
+            for item in support:
+                target_path.extend(self.dump_image(item))
+            # target_path = self.dump_image(support[current_class])
             for i in range(n_shots):
                 msgs.append(
                     {
