@@ -15,9 +15,9 @@ from .image_mcq import (
 )
 from .image_mt import MMDUDataset
 from .image_vqa import (
-    CHESS,
     CLEVR,
     CRPE,
+    Classfication_LLM,
     CustomVQADataset,
     ImageVQADataset,
     LLaVABench,
@@ -169,7 +169,7 @@ IMAGE_DATASET = [
     OpenMI,
     CLEVR,
     Operator_Induction,
-    CHESS,
+    Classfication_LLM,
 ]
 
 VIDEO_DATASET = [MMBenchVideo, VideoMME, MVBench, MVBench_MP4]

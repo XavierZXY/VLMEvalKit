@@ -47,6 +47,7 @@ class Qwen2VLPromptMixin:
                 "CLEVR",
                 "Operator_Induction",
                 "CHESS",
+                "Animals",
             }
         ):  # MMVet VQA has its own prompt
             return True

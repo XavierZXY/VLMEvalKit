@@ -241,7 +241,7 @@ def generate_tsv_file(
         tsvreader = csv.DictReader(query_file, delimiter="\t")
         query_data = list(tsvreader)
 
-    output_tsv = path + query_name + retireve_method + "_retrieved.tsv"
+    output_tsv = path + query_name + retireve_method + ".tsv"
     with open(output_tsv, "w", newline="", encoding="utf-8") as tsv_file:
         writer = csv.writer(tsv_file, delimiter="\t")
 
@@ -269,7 +269,7 @@ def main():
     # path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
     # path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
     # datasets_name = "Open_MI.tsv"
-    path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/chess/"
+    path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/tools/datasets/animals/"
     query_name = "query"
     support_name = "support"
 
@@ -281,8 +281,8 @@ def main():
     icl_images = dict()
     icl_query, icl_images = load_data(path, support_name)
 
-    # get the index of different retireve methods.(SI, SQ, SQA ...)
-    retrieval_method = "SI"
+    # get the index of different retireve methods.(SI, SQ, herding...)
+    retrieval_method = "herding"
     retireve_data = retireve_icl_data(
         query,
         images,

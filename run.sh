@@ -6,7 +6,7 @@ NC='\033[0m'
 
 # 定义变量
 # CLEVR CLEVR_SQ Open_MI Operator_Induction
-DATASET='Open_MI'
+DATASET='Animals_herding'
 RETRY_RANGE=10
 MODEL='GPT4V'
 
