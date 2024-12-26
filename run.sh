@@ -4,6 +4,11 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+# 定义变量
+RETRY_RANGE=10
+DATASET='CHESS_random'
+MODEL='GPT4V'
+
 source .venv/bin/activate &&
 # torchrun --nproc-per-node=8  run.py --data MMVet --model Qwen2-VL-7B-Instruct --verbose;
 # torchrun --nproc-per-node=6  run.py --data MMBench_DEV_CN_V11 --model Qwen2-VL-7B-Instruct --verbose
@@ -12,13 +17,9 @@ source .venv/bin/activate &&
 # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model InternVL2-8B --verbose --shots=0
 
 # keep retry util success
-for attempt in {0..10}; do
-    # python run.py --data MME --model Qwen2-VL-7B-Instruct --verbose
-    # Open_MI, CLEVR, Operator_Induction 
-    # Qwen2-VL-2B-Instruct qwen_chat  Qwen2-VL-7B-Instruct InternVL2-8B idefics2_8b
-    # 
+for attempt in $(seq 1 $RETRY_RANGE); do
     export OMP_NUM_THREADS=24
-    python run.py --data CHESS --model GPT4V --verbose --shots="$attempt"
+    python run.py --data "$DATASET" --model "$MODEL" --verbose --shots="$attempt"
     # python run.py --data BLINK --model GPT4V --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data CLEVR CLEVR_SQ --model Qwen2-VL-2B-Instruct qwen_chat --verbose --shots="$attempt"
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data CLEVR_SQ --model Qwen2-VL-7B-Instruct --verbose --shots="$attempt"
@@ -27,14 +28,16 @@ for attempt in {0..10}; do
     # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Operator_Induction --model Qwen2-VL-7B-Instruct --verbose --shots=2
     # CUDA_VISIBLE_DEVICES=1 python run.py --data BLINK --model Qwen2-VL-7B-Instruct --verbose
     if [ $? -eq 0 ]; then
-        echo -e "$GREEN Command executed  successfully. Exiting. Let's sleep 15s.$NC"
-        sleep 15
+        echo -e "$GREEN Command executed  successfully. Exiting. Let's sleep 10s.$NC"
+        sleep 10
     else
-        echo -e "$RED Command  failed. Retrying in 60 seconds... $NC"
-        sleep 60 
+        echo -e "$RED Command  failed. Retrying in 10 seconds... $NC"
+        sleep 10 
     fi
 done
 
-# if [ "$attempt" -eq 2 ]; then
-#     echo -e "$RED Maximum attempts reached. Exiting. $NC"
-# fi
+# post log upload
+if [ "$attempt" -eq $RETRY_RANGE ]; then
+    echo -e "$RED Maximum attempts reached. Exiting. $NC"
+    python icltools/post_log.py --data "$DATASET" --model "$MODEL" --n_shots "$attempt"
+fi

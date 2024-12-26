@@ -3,6 +3,7 @@ import csv
 import json
 import os
 import pickle
+import random
 from collections import defaultdict
 from io import BytesIO
 
@@ -51,7 +52,10 @@ def retireve_icl_data(
         icl_image (_type_): _description_
         path (_type_): _description_
         shots (int, optional): _description_. Defaults to 10.
-        retrieval_method (str, optional): _description_. Defaults to "SQ".
+        retrieval_method (str, optional): Defaults to "SQ".
+            SQ: Similar Query (Y)
+            SI: Similar Image (N)
+            herding: Herding  (Y)
 
     Returns:
         dict : {query_index: [retrieved_index1, retrieved_index2, ...]}
@@ -163,6 +167,15 @@ def retireve_icl_data(
                 list(icl_image.keys())[i] for i in selected_indices
             ]
         return top_queries
+    elif retrieval_method == "random":
+        top_queries = {}
+        icl_vectors = np.array(list(icl_images_features.values())).squeeze()
+        selected_indices = random.sample(range(len(icl_vectors)), shots)
+        for key, value in query_features.items():
+            top_queries[key] = [
+                list(icl_image.keys())[i] for i in selected_indices
+            ]
+        return top_queries
 
 
 def read_tsv_file(retireve_data):
@@ -253,6 +266,7 @@ def main():
     icl_query, icl_images = load_data(path, support_name)
 
     # get the index of different retireve methods.(SI, SQ, SQA ...)
+    retrieval_method = "random"
     retireve_data = retireve_icl_data(
         query,
         images,
@@ -260,13 +274,17 @@ def main():
         icl_images,
         path,
         shots=10,
-        retrieval_method="herding",
+        retrieval_method=retrieval_method,
     )
     # read tsv file
     # read_tsv_file(retireve_data)
     # generate new tsv data file
     generate_tsv_file(
-        retireve_data, path, query_name, support_name, retireve_method="_herding"
+        retireve_data,
+        path,
+        query_name,
+        support_name,
+        retireve_method=f"_{retrieval_method}",
     )
 
 

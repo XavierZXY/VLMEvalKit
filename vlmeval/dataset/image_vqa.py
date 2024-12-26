@@ -1033,9 +1033,13 @@ class CHESS(ImageBaseDataset):
     TYPE = "VQA"
     DATASET_URL = {
         "CHESS": "https://opencompass.openxlab.space/utils/VLMEval/CHESS.tsv",
+        "CHESS_SQ": "https://opencompass.openxlab.space/utils/VLMEval/CHESS_SQ.tsv",
+        "CHESS_random": "https://opencompass.openxlab.space/utils/VLMEval/CHESS_random.tsv",
     }
     DATASET_MD5 = {
         "CHESS": "452fe2d3d08dda8db2957ad4f5ff16aa",
+        "CHESS_SQ": "452fe2d3d08dda8db2957ad4f5ff16aa",
+        "CHESS_random": "3c0bf721a54b9e31faeabcf4d4aa1065",
     }
 
     @classmethod

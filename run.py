@@ -8,7 +8,10 @@ from vlmeval.inference import infer_data_job
 from vlmeval.inference_mt import infer_data_job_mt
 from vlmeval.inference_video import infer_data_job_video
 from vlmeval.smp import *
-from vlmeval.utils.result_transfer import MMMU_result_transfer, MMTBench_result_transfer
+from vlmeval.utils.result_transfer import (
+    MMMU_result_transfer,
+    MMTBench_result_transfer,
+)
 
 # try:
 #     # 5678 is the default attach port in the VS Code debug configurations. Unless a host and port are specified, host defaults to 127.0.0.1
@@ -30,17 +33,27 @@ def parse_args():
     parser.add_argument("--use-subtitle", action="store_true")
     # Work Dir
     parser.add_argument(
-        "--work-dir", type=str, default="./outputs", help="select the output directory"
+        "--work-dir",
+        type=str,
+        default="./outputs",
+        help="select the output directory",
     )
     # Infer + Eval or Infer Only
-    parser.add_argument("--mode", type=str, default="all", choices=["all", "infer"])
+    parser.add_argument(
+        "--mode", type=str, default="all", choices=["all", "infer"]
+    )
     # API Kwargs, Apply to API VLMs and Judge API LLMs
-    parser.add_argument("--nproc", type=int, default=4, help="Parallel API calling")
+    parser.add_argument(
+        "--nproc", type=int, default=4, help="Parallel API calling"
+    )
     parser.add_argument(
         "--retry", type=int, default=None, help="retry numbers for API VLMs"
     )
     parser.add_argument(
-        "--shots", type=int, default=0, help="few shots for VLMs,default 0 for all"
+        "--shots",
+        type=int,
+        default=0,
+        help="few shots for VLMs,default 0 for all",
     )
     # Explicitly Set the Judge Model
     parser.add_argument("--judge", type=str, default=None)
@@ -48,7 +61,9 @@ def parse_args():
     parser.add_argument("--verbose", action="store_true")
     # Configuration for Resume
     # Ignore: will not rerun failed VLM inference
-    parser.add_argument("--ignore", action="store_true", help="Ignore failed indices. ")
+    parser.add_argument(
+        "--ignore", action="store_true", help="Ignore failed indices. "
+    )
     # Rerun: will remove all evaluation temp files
     parser.add_argument("--rerun", action="store_true")
     args = parser.parse_args()
@@ -231,7 +246,9 @@ def main():
                 if "OPENAI_API_BASE_JUDGE" in os.environ and len(
                     os.environ["OPENAI_API_BASE_JUDGE"]
                 ):
-                    judge_kwargs["api_base"] = os.environ["OPENAI_API_BASE_JUDGE"]
+                    judge_kwargs["api_base"] = os.environ[
+                        "OPENAI_API_BASE_JUDGE"
+                    ]
 
                 if rank == 0:
                     if dataset_name in ["MMMU_TEST"]:

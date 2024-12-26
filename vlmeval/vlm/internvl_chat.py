@@ -231,6 +231,7 @@ class InternVLChat(BaseModel):
                 "CLEVR_HERDING",
                 "Operator_Induction",
                 "CHESS",
+                "CHESS_random",
             ],
             dataset,
         ):
