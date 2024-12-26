@@ -41,7 +41,13 @@ class Qwen2VLPromptMixin:
             return True
         if dataset_type == "VQA" and not any(
             dataset.startswith(prefix)
-            for prefix in {"MMVet", "Open_MI", "CLEVR", "Operator_Induction"}
+            for prefix in {
+                "MMVet",
+                "Open_MI",
+                "CLEVR",
+                "Operator_Induction",
+                "CHESS",
+            }
         ):  # MMVet VQA has its own prompt
             return True
         return False
@@ -77,14 +83,20 @@ class Qwen2VLPromptMixin:
         options_prompt = "Options:\n"
         for key, item in options.items():
             options_prompt += f"{key}. {item}\n"
-        hint = line["hint"] if ("hint" in line and not pd.isna(line["hint"])) else None
+        hint = (
+            line["hint"]
+            if ("hint" in line and not pd.isna(line["hint"]))
+            else None
+        )
         prompt = ""
         if hint is not None:
             prompt += f"Hint: {hint}\n"
         prompt += f"Question: {question}\n"
         if len(options):
             prompt += options_prompt
-            prompt += "Please select the correct answer from the options above. \n"
+            prompt += (
+                "Please select the correct answer from the options above. \n"
+            )
         prompt = prompt.rstrip()
         msgs = []
         if isinstance(tgt_path, list):
@@ -97,7 +109,9 @@ class Qwen2VLPromptMixin:
     def _build_mcq_prompt(self, line, dataset: str) -> list[dict[str, str]]:
         """change the prompt for MCQ dataset: use chinese prompt if the question contains chinese characters."""
         MCQ_CN_PROMPT = "请直接回答选项字母。"
-        MCQ_EN_PROMPT = "Please select the correct answer from the options above."
+        MCQ_EN_PROMPT = (
+            "Please select the correct answer from the options above."
+        )
 
         import string
 
@@ -120,7 +134,11 @@ class Qwen2VLPromptMixin:
         options_prompt = "Options:\n"
         for key, item in options.items():
             options_prompt += f"{key}. {item}\n"
-        hint = line["hint"] if ("hint" in line and not pd.isna(line["hint"])) else None
+        hint = (
+            line["hint"]
+            if ("hint" in line and not pd.isna(line["hint"]))
+            else None
+        )
         prompt = ""
         if hint is not None:
             prompt += f"Hint: {hint}\n"
@@ -157,7 +175,9 @@ class Qwen2VLPromptMixin:
         self, line, few_shot_examples, dataset: str
     ) -> list[dict[str, str]]:
         """change the prompt for YORN dataset:"""
-        YORN_PROMPT = "Now, according the above exapmles. Please answer yes or no."
+        YORN_PROMPT = (
+            "Now, according the above exapmles. Please answer yes or no."
+        )
 
         tgt_path = self.dump_image(line, dataset)
         question = line["question"]
@@ -179,7 +199,9 @@ class Qwen2VLPromptMixin:
                 example_answer = example["answer"]
 
                 if isinstance(example_tgt_path, list):
-                    msgs.extend([dict(type="image", value=p) for p in example_tgt_path])
+                    msgs.extend(
+                        [dict(type="image", value=p) for p in example_tgt_path]
+                    )
                 else:
                     msgs.append(dict(type="image", value=example_tgt_path))
 

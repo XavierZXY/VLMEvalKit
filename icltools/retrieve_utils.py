@@ -41,7 +41,22 @@ def retireve_icl_data(
     path,
     shots: int = 10,
     retrieval_method="SQ",
-):
+) -> dict | None:
+    """_summary_
+
+    Args:
+        query (_type_): _description_
+        images (_type_): _description_
+        icl_query (_type_): _description_
+        icl_image (_type_): _description_
+        path (_type_): _description_
+        shots (int, optional): _description_. Defaults to 10.
+        retrieval_method (str, optional): _description_. Defaults to "SQ".
+
+    Returns:
+        dict : {query_index: [retrieved_index1, retrieved_index2, ...]}
+    """
+
     def _load_or_extract_features(file_path, data, extract_fn):
         if os.path.exists(file_path):
             with open(file_path, "rb") as f:
@@ -125,6 +140,29 @@ def retireve_icl_data(
         return top_queries
     elif retrieval_method == "SI":
         return None
+    elif retrieval_method == "herding":
+        top_queries = {}
+        icl_vectors = np.array(list(icl_images_features.values())).squeeze()
+        mean_vector = np.mean(icl_vectors, axis=0)
+        selected_indices = []
+        for _ in range(shots):
+            valid_indices = np.isfinite(icl_vectors).all(axis=1)
+            distances = np.linalg.norm(
+                icl_vectors[valid_indices] - mean_vector, axis=1
+            )
+            max_index = np.argmax(distances)
+            selected_indices.append(max_index)
+            mean_vector = (
+                mean_vector * len(selected_indices) + icl_vectors[max_index]
+            ) / (len(selected_indices) + 1)
+            icl_vectors[
+                max_index
+            ] = -np.inf  # Exclude this index from future selection
+        for key, value in query_features.items():
+            top_queries[key] = [
+                list(icl_image.keys())[i] for i in selected_indices
+            ]
+        return top_queries
 
 
 def read_tsv_file(retireve_data):
@@ -146,7 +184,9 @@ def read_tsv_file(retireve_data):
                     print("\n")
 
 
-def generate_tsv_file(retireve_data, path, query_name, support_name):
+def generate_tsv_file(
+    retireve_data, path, query_name, support_name, retireve_method
+):
     # to store the full data of retireve data(index,question, answer, image)
     retireve_full_data = defaultdict(list)
     retireve_data_headers = []
@@ -172,7 +212,7 @@ def generate_tsv_file(retireve_data, path, query_name, support_name):
         tsvreader = csv.DictReader(query_file, delimiter="\t")
         query_data = list(tsvreader)
 
-    output_tsv = path + query_name + "_retrieved.tsv"
+    output_tsv = path + query_name + retireve_method + "_retrieved.tsv"
     with open(output_tsv, "w", newline="", encoding="utf-8") as tsv_file:
         writer = csv.writer(tsv_file, delimiter="\t")
 
@@ -198,11 +238,9 @@ def main():
     # Change the current working directory to the directory of this script
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     # path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
-    path = (
-        "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/open_mi/"
-    )
     # path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/clevr/"
     # datasets_name = "Open_MI.tsv"
+    path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/icltools/datasets/chess/"
     query_name = "query"
     support_name = "support"
 
@@ -216,12 +254,20 @@ def main():
 
     # get the index of different retireve methods.(SI, SQ, SQA ...)
     retireve_data = retireve_icl_data(
-        query, images, icl_query, icl_images, path, shots=10
+        query,
+        images,
+        icl_query,
+        icl_images,
+        path,
+        shots=10,
+        retrieval_method="herding",
     )
     # read tsv file
     # read_tsv_file(retireve_data)
     # generate new tsv data file
-    generate_tsv_file(retireve_data, path, query_name, support_name)
+    generate_tsv_file(
+        retireve_data, path, query_name, support_name, retireve_method="_herding"
+    )
 
 
 if __name__ == "__main__":
