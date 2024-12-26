@@ -143,7 +143,23 @@ def retireve_icl_data(
             top_queries[q_key] = [list(icl_query.keys())[i] for i in top_indices]
         return top_queries
     elif retrieval_method == "SI":
-        return None
+        # Compute cosine similarity for each image individually
+        top_queries = {}
+        for q_key, q_vector in images_features.items():
+            q_vector = q_vector.squeeze()
+            icl_vectors = np.array(list(icl_images_features.values())).squeeze()
+
+            similarities = np.dot(icl_vectors, q_vector.T).squeeze()
+            similarities /= np.linalg.norm(icl_vectors, axis=1) * np.linalg.norm(
+                q_vector
+            )
+
+            # Get the indices of the top 'shots' similar images
+            top_indices = np.argsort(similarities)[-shots:][::-1]
+
+            # Retrieve the top similar images
+            top_queries[q_key] = [list(icl_image.keys())[i] for i in top_indices]
+        return top_queries
     elif retrieval_method == "herding":
         top_queries = {}
         icl_vectors = np.array(list(icl_images_features.values())).squeeze()
@@ -266,7 +282,7 @@ def main():
     icl_query, icl_images = load_data(path, support_name)
 
     # get the index of different retireve methods.(SI, SQ, SQA ...)
-    retrieval_method = "random"
+    retrieval_method = "SI"
     retireve_data = retireve_icl_data(
         query,
         images,
