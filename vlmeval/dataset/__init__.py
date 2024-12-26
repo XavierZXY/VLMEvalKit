@@ -15,6 +15,7 @@ from .image_mcq import (
 )
 from .image_mt import MMDUDataset
 from .image_vqa import (
+    CHESS,
     CLEVR,
     CRPE,
     CustomVQADataset,
@@ -46,7 +47,14 @@ class ConcatDataset(ImageBaseDataset):
     # Each single dataset should not have a field named `SUB_DATASET`
 
     DATASET_SETS = {
-        "MMMB": ["MMMB_ar", "MMMB_cn", "MMMB_en", "MMMB_pt", "MMMB_ru", "MMMB_tr"],
+        "MMMB": [
+            "MMMB_ar",
+            "MMMB_cn",
+            "MMMB_en",
+            "MMMB_pt",
+            "MMMB_ru",
+            "MMMB_tr",
+        ],
         "MTL_MMBench_DEV": [
             "MMBench_dev_ar",
             "MMBench_dev_cn",
@@ -70,7 +78,10 @@ class ConcatDataset(ImageBaseDataset):
         TYPES = [x.TYPE for x in self.dataset_map.values()]
         MODALITIES = [x.MODALITY for x in self.dataset_map.values()]
         assert np.all([x == TYPES[0] for x in TYPES]), (datasets, TYPES)
-        assert np.all([x == MODALITIES[0] for x in MODALITIES]), (datasets, MODALITIES)
+        assert np.all([x == MODALITIES[0] for x in MODALITIES]), (
+            datasets,
+            MODALITIES,
+        )
         self.TYPE = TYPES[0]
         self.MODALITY = MODALITIES[0]
         data_all = []
@@ -169,7 +180,11 @@ CUSTOM_DATASET = [CustomMCQDataset, CustomVQADataset, CustomTextMCQDataset]
 DATASET_COLLECTION = [ConcatDataset]
 
 DATASET_CLASSES = (
-    IMAGE_DATASET + VIDEO_DATASET + TEXT_DATASET + CUSTOM_DATASET + DATASET_COLLECTION
+    IMAGE_DATASET
+    + VIDEO_DATASET
+    + TEXT_DATASET
+    + CUSTOM_DATASET
+    + DATASET_COLLECTION
 )
 SUPPORTED_DATASETS = []
 for DATASET_CLS in DATASET_CLASSES:
