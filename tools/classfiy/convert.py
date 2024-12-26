@@ -10,18 +10,18 @@ def convert_image_to_base64(image_path):
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-def main(folder_path, output_tsv1, output_tsv2):
+def main(folder_path, output_tsv1, output_tsv2, dataset_name):
     data = []
     for filename in os.listdir(folder_path):
         if filename.endswith(".jpg"):
             prefix_index = filename.split(".")[0]
-            id_index = prefix_index.split("_")[-1]
+            id_index = prefix_index.split("_")[1:]
             answer_index = prefix_index.split("_")[0]
             image_path = os.path.join(folder_path, filename)
             image_base64 = convert_image_to_base64(image_path)
             data.append(
                 {
-                    "index": f"chess_{id_index}",
+                    "index": f"{dataset_name}_{id_index}",
                     "question": "what is it?",
                     "answer": answer_index,
                     "image": image_base64,
@@ -36,7 +36,8 @@ def main(folder_path, output_tsv1, output_tsv2):
 
 
 if __name__ == "__main__":
+    dataset_name = "animals"
     folder_path = "/home/zxy/codes/working/ICLBoom/VLMEvalKit/datasets/animals-test"  # 替换为你的文件夹路径
     output_tsv1 = "./query.tsv"  # 替换为你想要输出的训练集文件名
     output_tsv2 = "./support.tsv"  # 替换为你想要输出的测试集文件名
-    main(folder_path, output_tsv1, output_tsv2)
+    main(folder_path, output_tsv1, output_tsv2, dataset_name)

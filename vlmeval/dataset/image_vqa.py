@@ -1123,8 +1123,7 @@ class Classfication_LLM(ImageBaseDataset):
                 type="text",
                 value=(
                     # "You need to find all objects within the image that satisfy the condition. "
-                    f"The condition is {question}\n"
-                    "Answer the question using one word."
+                    f"{question} Answer the question using one word."
                 ),
             )
         )
