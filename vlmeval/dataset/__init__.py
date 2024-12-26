@@ -169,6 +169,7 @@ IMAGE_DATASET = [
     OpenMI,
     CLEVR,
     Operator_Induction,
+    CHESS,
 ]
 
 VIDEO_DATASET = [MMBenchVideo, VideoMME, MVBench, MVBench_MP4]
