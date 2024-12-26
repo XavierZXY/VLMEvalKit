@@ -18,7 +18,7 @@ source .venv/bin/activate &&
 # CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 torchrun --nproc-per-node=8 run.py --data Open_MI --model InternVL2-8B --verbose --shots=0
 
 # keep retry util success
-for attempt in $(seq 1 $RETRY_RANGE); do
+for attempt in $(seq 0 $RETRY_RANGE); do
     export OMP_NUM_THREADS=24
     python run.py --data "$DATASET" --model "$MODEL" --verbose --shots="$attempt"
     # python run.py --data BLINK --model GPT4V --verbose --shots="$attempt"
