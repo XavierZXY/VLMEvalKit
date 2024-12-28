@@ -5,8 +5,8 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 # 定义变量
-# CLEVR CLEVR_SQ Open_MI Operator_Induction
-DATASET='Animals_herding'
+# CLEVR CLEVR_SQ Open_MI Operator_Induction CHESS
+DATASET='CHESS'
 RETRY_RANGE=10
 MODEL='GPT4V'
 
@@ -40,5 +40,5 @@ done
 # post log upload
 if [ "$attempt" -eq $RETRY_RANGE ]; then
     echo -e "$RED Maximum attempts reached. Exiting. $NC"
-    python icltools/post_log.py --data "$DATASET" --model "$MODEL" --n_shots "$attempt"
+    python tools/post_log.py --data "$DATASET" --model "$MODEL" --n_shots "$attempt"
 fi
